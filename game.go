@@ -7,42 +7,21 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/looplab/fsm"
 )
 
 type Game struct {
-	fsm   *fsm.FSM
+	state State
 	deck  *Deck
 	cards map[string]Card
 }
 
 func NewGame() (*Game, error) {
-	var game Game
 	cards, err := LoadCards("cards.json")
 	if err != nil {
 		return nil, err
 	}
-	game.cards = cards
 
-	fsm := fsm.NewFSM(
-		"GameStart",
-		fsm.Events{
-			{Name: "GameEnded", Src: []string{"GameStart", "RoundStart", "RoundOver"}, Dst: "GameOver"},
-			{Name: "RoundStarted", Src: []string{"GameStart"}, Dst: "RoundStart"},
-			{Name: "RoundEnded", Src: []string{"RoundStart"}, Dst: "RoundOver"},
-		},
-		fsm.Callbacks{
-			"enter_state": func(e *fsm.Event) {
-				log.Printf("event e: %v", e)
-			},
-			"enter_RoundStart": func(e *fsm.Event) {
-				game.InitDeck()
-			},
-		},
-	)
-	game.fsm = fsm
-
-	return &game, nil
+	return &Game{cards: cards, state: GameStart}, nil
 }
 
 func (g *Game) InitDeck() {
@@ -53,39 +32,40 @@ func (g *Game) InitDeck() {
 }
 
 func (g *Game) Update() error {
-	switch g.fsm.Current() {
-	case "GameStart":
+	switch g.state {
+	case GameStart:
 		if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-			g.fsm.Event("RoundStarted")
+			g.InitDeck()
+			g.state = RoundStart
 		} else if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-			g.fsm.Event("GameEnded")
+			g.state = GameOver
 		}
-	case "RoundStart":
+	case RoundStart:
 		if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-			g.fsm.Event("RoundEnded")
+			g.state = RoundOver
 		}
-	case "RoundOver":
-		g.fsm.Event("GameEnded")
-	case "GameOver":
+	case RoundOver:
+		g.state = GameOver
+	case GameOver:
 		os.Exit(0)
 	default:
-		log.Fatalf("invalid game state: %s", g.fsm.Current())
+		log.Fatalf("invalid game state: %s", g.state)
 	}
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	switch g.fsm.Current() {
-	case "GameStart":
+	switch g.state {
+	case GameStart:
 		ebitenutil.DebugPrint(screen, "Game Start")
-	case "RoundStart":
+	case RoundStart:
 		ebitenutil.DebugPrint(screen, "Round Start")
-	case "RoundOver":
+	case RoundOver:
 		ebitenutil.DebugPrint(screen, "Round Over")
-	case "GameOver":
+	case GameOver:
 		ebitenutil.DebugPrint(screen, "Game Over")
 	default:
-		log.Fatalf("invalid game state: %s", g.fsm.Current())
+		log.Fatalf("invalid game state: %s", g.state)
 	}
 }
 
