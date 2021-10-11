@@ -10,12 +10,13 @@ func main() {
 	// load config
 
 	// load assets
+	LoadCards("cards.json")
 
 	// initialize game object
 	game := NewGame()
 
 	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("Hello, World!")
+	ebiten.SetWindowTitle("Around the World")
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}

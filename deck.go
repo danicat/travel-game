@@ -9,6 +9,16 @@ type Deck struct {
 	cards []string
 }
 
+func NewDeck(cards map[string]Card) *Deck {
+	var d Deck
+	for k, card := range cards {
+		for i := 0; i < card.Count; i++ {
+			d.Insert(k)
+		}
+	}
+	return &d
+}
+
 func (d *Deck) Insert(card string) {
 	d.cards = append(d.cards, card)
 }

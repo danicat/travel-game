@@ -1,0 +1,41 @@
+{
+    "O": {
+        "name": "Orientation",
+        "type": "green",
+        "effect": "orientation",
+        "playable": ["lost"],
+        "asset": "assets/green.orientation.png",
+        "count": 14
+    },
+    "P": {
+        "name": "Lost",
+        "type": "red",
+        "effect": "lost",
+        "playable": ["orientation"],
+        "asset": "assets/red.lost.png",
+        "count": 5
+    },
+    "S": {
+        "name": "Health",
+        "type": "blue",
+        "counter": "epidemy",
+        "permaEffect": "remedy",
+        "asset": "assets/blue.health.png",
+        "count": 1
+    },
+    "TC": {
+        "name": "Civilization",
+        "type": "yellow",
+        "terrain": "civilization",
+        "asset": "assets/yellow.civilization.png",
+        "count": 5
+    },
+    "1000": {
+        "name": "1000",
+        "type": "white",
+        "value": 1000,
+        "allowed": ["desert", "savage_land", "civilization"],
+        "asset": "assets/white.walking.png",
+        "count": 10
+    }
+}

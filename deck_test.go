@@ -75,3 +75,11 @@ func TestShuffle(t *testing.T) {
 		t.Fatal("expected deck to be different after shuffle")
 	}
 }
+
+func TestNewDeck(t *testing.T) {
+	LoadCards("cards.json")
+	d := NewDeck(Cards)
+	if len(d.cards) != 35 {
+		t.Fatal("expected 35 cards")
+	}
+}
