@@ -5,23 +5,22 @@ import (
 )
 
 func TestLoadCards(t *testing.T) {
-	if len(Cards) != 0 {
-		t.Fatal("expected no cards loaded before running test")
+	cards, err := LoadCards("cards.json")
+	if err != nil {
+		t.Fatalf("expected no errors loading cards, got %s", err)
 	}
 
-	LoadCards("cards.json")
-
-	if len(Cards) == 0 {
+	if len(cards) == 0 {
 		t.Fatal("expected cards to be loaded")
 	}
 
-	for _, card := range Cards {
+	for _, card := range cards {
 		if card.image == nil {
 			t.Errorf("expected all cards to have an asset. card %s doesn't have one", card.Name)
 		}
 	}
 
-	if Cards["O"].Type != "green" {
-		t.Errorf("%s card should be green, got %s", Cards["O"].Name, Cards["O"].Type)
+	if cards["O"].Type != "green" {
+		t.Errorf("%s card should be green, got %s", cards["O"].Name, cards["O"].Type)
 	}
 }

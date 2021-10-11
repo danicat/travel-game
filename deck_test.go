@@ -77,8 +77,11 @@ func TestShuffle(t *testing.T) {
 }
 
 func TestNewDeck(t *testing.T) {
-	LoadCards("cards.json")
-	d := NewDeck(Cards)
+	cards, err := LoadCards("cards.json")
+	if err != nil {
+		t.Fatalf("expected no errors, got %s", err)
+	}
+	d := NewDeck(cards)
 	if len(d.cards) != 35 {
 		t.Fatal("expected 35 cards")
 	}

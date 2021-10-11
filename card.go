@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -26,30 +26,32 @@ type Card struct {
 	image       *ebiten.Image
 }
 
-var Cards map[string]Card
+func LoadCards(file string) (map[string]Card, error) {
+	var cards map[string]Card
 
-func LoadCards(file string) {
 	f, err := os.Open(file)
 	if err != nil {
-		log.Fatalf("unable to open file: %s", err)
+		return nil, fmt.Errorf("unable to open file: %s", err)
 	}
 
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
-		log.Fatalf("unable to read file: %s", err)
+		return nil, fmt.Errorf("unable to read file: %s", err)
 	}
 
-	err = json.Unmarshal(b, &Cards)
+	err = json.Unmarshal(b, &cards)
 	if err != nil {
-		log.Fatalf("error parsing json: %s", err)
+		return nil, fmt.Errorf("error parsing json: %s", err)
 	}
 
-	for k, card := range Cards {
+	for k, card := range cards {
 		img, _, err := ebitenutil.NewImageFromFile(card.Asset)
 		if err != nil {
-			log.Fatalf("error loading card %#v asset: %s", card, err)
+			return nil, fmt.Errorf("error loading card %#v asset: %s", card, err)
 		}
 		card.image = img
-		Cards[k] = card
+		cards[k] = card
 	}
+
+	return cards, nil
 }

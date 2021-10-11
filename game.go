@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -10,10 +11,17 @@ import (
 )
 
 type Game struct {
-	fsm *fsm.FSM
+	fsm   *fsm.FSM
+	deck  *Deck
+	cards map[string]Card
 }
 
-func NewGame() *Game {
+func NewGame() (*Game, error) {
+	cards, err := LoadCards("cards.json")
+	if err != nil {
+		return nil, err
+	}
+
 	fsm := fsm.NewFSM(
 		"GameStart",
 		fsm.Events{
@@ -25,7 +33,16 @@ func NewGame() *Game {
 			},
 		},
 	)
-	return &Game{fsm: fsm}
+	return &Game{
+		fsm:   fsm,
+		cards: cards,
+	}, nil
+}
+
+func (g *Game) InitDeck() {
+	deck := NewDeck(g.cards)
+	deck.Shuffle(time.Now().UnixNano())
+	g.deck = deck
 }
 
 func (g *Game) Update() error {

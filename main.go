@@ -7,13 +7,10 @@ import (
 )
 
 func main() {
-	// load config
-
-	// load assets
-	LoadCards("cards.json")
-
-	// initialize game object
-	game := NewGame()
+	game, err := NewGame()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	ebiten.SetWindowSize(640, 480)
 	ebiten.SetWindowTitle("Around the World")
