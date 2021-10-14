@@ -19,6 +19,7 @@ type Game struct {
 	cards   map[string]Card
 	players []*Player
 
+	cemitery []Card
 	cardBack *ebiten.Image
 
 	// Gane State
@@ -138,12 +139,13 @@ func (g *Game) Play(card Card, target int) error {
 	case "green":
 		for _, p := range card.Playable {
 			if p == g.players[target].BattleStatus() {
-				g.players[target].Receive(card)
+				return g.players[target].Receive(card)
 			}
 		}
 	case "yellow":
-		g.players[target].Receive(card)
+		return g.players[target].Receive(card)
 	}
+	g.cemitery = append(g.cemitery, card)
 	return nil
 }
 
@@ -168,6 +170,18 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// 	card := k.image
 	// 	screen.DrawImage(card, &g.op)
 	// }
+
+	g.op.GeoM.Reset()
+	g.op.GeoM.Scale(.14, .14)
+	g.op.GeoM.Translate(config.Layout.System.StartX+config.Layout.Deck.StartX, config.Layout.System.StartY+config.Layout.Deck.StartY)
+	screen.DrawImage(g.cardBack, &g.op)
+
+	if len(g.cemitery) > 0 {
+		g.op.GeoM.Reset()
+		g.op.GeoM.Scale(.10, .10)
+		g.op.GeoM.Translate(config.Layout.System.StartX+config.Layout.Cemitery.StartX, config.Layout.System.StartY+config.Layout.Cemitery.StartY)
+		screen.DrawImage(g.cemitery[len(g.cemitery)-1].image, &g.op)
+	}
 
 	for i := range g.players {
 		if battle := g.players[i].Battle(); battle.Key != "" {
@@ -200,10 +214,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		} else {
 			scale = .10
 		}
-		g.op.GeoM.Scale(scale, scale)
 
+		g.op.GeoM.Scale(scale, scale)
 		g.op.GeoM.Translate(config.Layout.Hand.StartX+float64(i)*config.Layout.Card.Width, config.Layout.Hand.StartY)
-		//g.op.GeoM.Translate(float64(i)*config.Layout.Card.Width+10, 0)
 		screen.DrawImage(c.image, &g.op)
 	}
 }
