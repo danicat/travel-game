@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func TestInsert(t *testing.T) {
-	cards := []string{"O", "FD", "SR", "E"}
+	cards := []Card{{Key: "O"}, {Key: "FD"}, {Key: "SR"}, {Key: "E"}}
 	deck := Deck{}
 	for _, c := range cards {
 		deck.Insert(c)
@@ -15,7 +15,7 @@ func TestInsert(t *testing.T) {
 }
 
 func TestDraw(t *testing.T) {
-	cards := []string{"O", "FD", "SR", "E"}
+	cards := []Card{{Key: "O"}, {Key: "FD"}, {Key: "SR"}, {Key: "E"}}
 	deck := Deck{}
 	for _, c := range cards {
 		deck.Insert(c)
@@ -35,7 +35,7 @@ func TestDraw(t *testing.T) {
 		t.Fatal("expected deck to have one less card")
 	}
 
-	if card != cards[len(cards)-1] {
+	if card.Key != cards[len(cards)-1].Key {
 		t.Fatalf("expected to be the %s card, but got %s", cards[len(cards)-1], card)
 	}
 }
@@ -51,7 +51,7 @@ func TestDrawNoCards(t *testing.T) {
 }
 
 func TestShuffle(t *testing.T) {
-	cards := []string{"O", "FD", "SR", "E"}
+	cards := []Card{{Key: "O"}, {Key: "FD"}, {Key: "SR"}, {Key: "E"}}
 	deck := Deck{}
 	for _, c := range cards {
 		deck.Insert(c)
@@ -65,7 +65,7 @@ func TestShuffle(t *testing.T) {
 
 	same := true
 	for i := 0; i < len(cards); i++ {
-		if cards[i] != deck.cards[i] {
+		if cards[i].Key != deck.cards[i].Key {
 			same = false
 			break
 		}

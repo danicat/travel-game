@@ -12,7 +12,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ebiten.SetWindowSize(640, 480)
+	config, err = LoadConfig("config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("config: %#v", config)
+
+	ebiten.SetWindowSize(config.ScreenWidth, config.ScreenHeight)
 	ebiten.SetWindowTitle("Around the World")
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)

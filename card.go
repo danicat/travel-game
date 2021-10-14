@@ -13,6 +13,7 @@ import (
 )
 
 type Card struct {
+	Key         string
 	Name        string
 	Type        string
 	Asset       string
@@ -49,9 +50,14 @@ func LoadCards(file string) (map[string]Card, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error loading card %#v asset: %s", card, err)
 		}
+		card.Key = k
 		card.image = img
 		cards[k] = card
 	}
 
 	return cards, nil
+}
+
+func (c *Card) String() string {
+	return c.Key
 }

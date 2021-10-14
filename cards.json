@@ -4,7 +4,7 @@
         "type": "green",
         "effect": "orientation",
         "playable": ["lost"],
-        "asset": "assets/green.orientation.png",
+        "asset": "assets/cards/green.orientation.png",
         "count": 14
     },
     "P": {
@@ -12,22 +12,70 @@
         "type": "red",
         "effect": "lost",
         "playable": ["orientation"],
-        "asset": "assets/red.lost.png",
+        "asset": "assets/cards/red.lost.png",
         "count": 5
+    },
+    "T": {
+        "name": "Work",
+        "type": "green",
+        "effect": "work",
+        "playable": ["penniless"],
+        "asset": "assets/cards/green.work.png",
+        "count": 6
+    },
+    "FD": {
+        "name": "Penniless",
+        "type": "red",
+        "effect": "penniless",
+        "playable": ["orientation"],
+        "asset": "assets/cards/red.penniless.png",
+        "count": 3
+    },    
+    "F": {
+        "name": "Escape",
+        "type": "green",
+        "effect": "escape",
+        "playable": ["hostiles"],
+        "asset": "assets/cards/green.escape.png",
+        "count": 6
+    },
+    "PH": {
+        "name": "Hostiles",
+        "type": "red",
+        "effect": "hostiles",
+        "playable": ["orientation"],
+        "asset": "assets/cards/red.hostiles.png",
+        "count": 3
+    },
+    "R": {
+        "name": "Remedy",
+        "type": "green",
+        "effect": "remedy",
+        "playable": ["epidemic"],
+        "asset": "assets/cards/green.remedy.png",
+        "count": 6
+    },
+    "E": {
+        "name": "Epidemic",
+        "type": "red",
+        "effect": "epidemic",
+        "playable": ["orientation"],
+        "asset": "assets/cards/red.epidemic.png",
+        "count": 3
     },
     "S": {
         "name": "Health",
         "type": "blue",
         "counter": "epidemy",
         "permaEffect": "remedy",
-        "asset": "assets/blue.health.png",
+        "asset": "assets/cards/blue.health.png",
         "count": 1
     },
     "TC": {
         "name": "Civilization",
         "type": "yellow",
         "terrain": "civilization",
-        "asset": "assets/yellow.civilization.png",
+        "asset": "assets/cards/yellow.civilization.png",
         "count": 5
     },
     "1000": {
@@ -35,7 +83,15 @@
         "type": "white",
         "value": 1000,
         "allowed": ["desert", "savage_land", "civilization"],
-        "asset": "assets/white.walking.png",
+        "asset": "assets/cards/white.walking.png",
         "count": 10
+    },
+    "8000": {
+        "name": "8000",
+        "type": "white",
+        "value": 8000,
+        "allowed": ["savage_land", "sea", "civilization"],
+        "asset": "assets/cards/white.balloon.png",
+        "count": 4
     }
 }

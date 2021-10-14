@@ -1,0 +1,55 @@
+{
+    "screen_width": 1024,
+    "screen_height": 768,
+    "hand_size": 6,
+
+    "layout": {
+        "players": [{
+            "startX": 0,
+            "startY": 384,
+            "width": 1024,
+            "height": 192
+        },{
+            "startX": 0,
+            "startY": 0,
+            "width": 1024,
+            "height": 192
+        }],
+        "system": {
+            "startX": 0,
+            "startY": 192,
+            "width": 1024,
+            "height": 192    
+        },
+        "hand": {
+            "startX": 0,
+            "startY": 576,
+            "width": 1024,
+            "heigth": 192
+        },
+        "terrain":{
+            "startX": 10,
+            "startY": 10
+        },
+        "battle": {
+            "startX": 130,
+            "startY": 10
+        },
+        "travel": {
+            "startX": 320,
+            "startY": 10
+        },
+        "deck":{
+            "startX": 10,
+            "startY": 10
+        },
+        "cemitery": {
+            "startX": 130,
+            "startY": 10
+        },
+        "card": {
+            "width": 120,
+            "height": 160
+        }
+    }
+}
