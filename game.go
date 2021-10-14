@@ -1,14 +1,16 @@
 package main
 
 import (
+	"fmt"
+	"image/color"
 	"log"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
 const HandSize = 6
@@ -24,10 +26,12 @@ type Game struct {
 
 	// Gane State
 	currentPlayer int
+	target        int
 	cardSelected  int
+	currentCard   Card
 
-	op      ebiten.DrawImageOptions
-	timeout sync.Once
+	op ebiten.DrawImageOptions
+	// timeout sync.Once
 }
 
 func NewGame() (*Game, error) {
@@ -67,16 +71,14 @@ func (g *Game) Deal(handSize int) {
 			}
 		}
 	}
-	log.Printf("player 0 hand: %v", g.players[0].hand)
-	log.Printf("player 1 hand: %v", g.players[1].hand)
 }
 
 func (g *Game) Update() error {
-	g.timeout.Do(func() {
-		time.AfterFunc(time.Second*60, func() {
-			g.state = GameOver
-		})
-	})
+	// g.timeout.Do(func() {
+	// 	time.AfterFunc(time.Second*60, func() {
+	// 		g.state = GameOver
+	// 	})
+	// })
 	switch g.state {
 	case GameStart:
 		g.InitDeck()
@@ -112,19 +114,52 @@ func (g *Game) Update() error {
 			if err != nil {
 				log.Printf("error playing card %s: %s", card.Key, err)
 			}
+			g.currentCard = card
 
-			err = g.Play(card, g.currentPlayer)
-			if err != nil {
-				log.Printf("error playing card %s: %s", card.Key, err)
+			g.state = Target
+		}
+	case BeforeTarget:
+		switch g.currentCard.Type {
+		case "red":
+			g.target = (g.currentPlayer + 1) % 2
+		default:
+			g.target = g.currentPlayer
+		}
+		g.state = Target
+
+	case Target:
+		if inpututil.IsKeyJustPressed(ebiten.KeyUp) || inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+			switch g.currentCard.Type {
+			case "yellow":
+				g.target = (g.target + 1) % 2
+			case "red":
+				// oponent x graveyard
+				if g.target == -1 {
+					g.target = (g.currentPlayer + 1) % 2
+				} else {
+					g.target = -1
+				}
+
+			default:
+				// self x graveyard
+				if g.target == g.currentPlayer {
+					g.target = -1
+				} else {
+					g.target = g.currentPlayer
+				}
 			}
+		}
 
+		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+			err := g.Play(g.currentCard, g.target)
+			if err != nil {
+				log.Printf("error playing card %s: %s", g.currentCard.Key, err)
+			}
 			g.state = TurnOver
 		}
+
 	case TurnOver:
-		g.currentPlayer = g.currentPlayer + 1
-		if g.currentPlayer > len(g.players)-1 {
-			g.currentPlayer = 0
-		}
+		g.currentPlayer = (g.currentPlayer + 1) % 2
 		g.cardSelected = 0
 		g.state = TurnStart
 	case GameOver:
@@ -135,44 +170,44 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Play(card Card, target int) error {
-	switch card.Type {
-	case "green":
-		for _, p := range card.Playable {
-			if p == g.players[target].BattleStatus() {
-				return g.players[target].Receive(card)
+	if target >= 0 {
+		targetPlayer := g.players[target]
+		switch card.Type {
+		case "white":
+			if targetPlayer.BattleStatus() == "orientation" {
+				if len(targetPlayer.terrain) == 0 {
+					return targetPlayer.Receive(card)
+				}
+				for _, a := range card.Allowed {
+					if a == targetPlayer.Terrain().Terrain {
+						return targetPlayer.Receive(card)
+					}
+				}
 			}
+
+		case "green":
+			for _, p := range card.Playable {
+				if p == targetPlayer.BattleStatus() {
+					return targetPlayer.Receive(card)
+				}
+			}
+		case "red":
+			if targetPlayer.BattleStatus() == "orientation" {
+				return targetPlayer.Receive(card)
+			}
+		case "yellow":
+			return targetPlayer.Receive(card)
 		}
-	case "yellow":
-		return g.players[target].Receive(card)
 	}
 	g.cemitery = append(g.cemitery, card)
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// screen.Fill(color.Transparent)
-	// screen.Fill(color.RGBA{R: 233, G: 212, B: 96, A: 0xaf})
-	// ebitenutil.DebugPrint(screen, fmt.Sprintf("Player %d Turn", g.currentPlayer))
-
-	// var cx, cy float64
-	// for i, k := range g.players[g.currentPlayer].Hand() {
-	// 	var scale float64
-	// 	g.op.GeoM.Reset()
-	// 	if g.state == Play && g.cardSelected == i {
-	// 		scale = .12
-	// 	} else {
-	// 		scale = .10
-	// 	}
-	// 	g.op.GeoM.Scale(scale, scale)
-	// 	cy = 100
-	// 	g.op.GeoM.Translate(cx, cy)
-	// 	cx += 1000 * scale
-	// 	card := k.image
-	// 	screen.DrawImage(card, &g.op)
-	// }
+	text.Draw(screen, fmt.Sprintf("Player %d Phase: %s", g.currentPlayer+1, g.state), ttfRoboto, config.ScreenWidth-300, config.ScreenHeight-30, color.White)
 
 	g.op.GeoM.Reset()
-	g.op.GeoM.Scale(.14, .14)
+	g.op.GeoM.Scale(.10, .14)
 	g.op.GeoM.Translate(config.Layout.System.StartX+config.Layout.Deck.StartX, config.Layout.System.StartY+config.Layout.Deck.StartY)
 	screen.DrawImage(g.cardBack, &g.op)
 
@@ -199,10 +234,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		}
 
 		g.op.GeoM.Reset()
+		g.op.GeoM.Scale(.10, .10)
 		g.op.GeoM.Translate(config.Layout.Players[i].StartX+config.Layout.Travel.StartX, config.Layout.Players[i].StartY+config.Layout.Travel.StartY)
+
 		for _, c := range g.players[i].travel {
 			screen.DrawImage(c.image, &g.op)
 			g.op.GeoM.Translate(20, 0)
+
 		}
 	}
 
@@ -218,6 +256,20 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.op.GeoM.Scale(scale, scale)
 		g.op.GeoM.Translate(config.Layout.Hand.StartX+float64(i)*config.Layout.Card.Width, config.Layout.Hand.StartY)
 		screen.DrawImage(c.image, &g.op)
+	}
+
+	switch g.state {
+	case Target:
+		var choice string
+		switch g.target {
+		case -1:
+			choice = "graveyard"
+		case g.currentPlayer:
+			choice = "self"
+		default:
+			choice = "oponent"
+		}
+		text.Draw(screen, choice, ttfRoboto, config.ScreenWidth/2, config.ScreenHeight/2, color.White)
 	}
 }
 

@@ -3,7 +3,7 @@
         "name": "Orientation",
         "type": "green",
         "effect": "orientation",
-        "playable": ["lost"],
+        "playable": ["lost", "escape", "remedy", "work"],
         "asset": "assets/cards/green.orientation.png",
         "count": 14
     },
@@ -71,6 +71,30 @@
         "asset": "assets/cards/blue.health.png",
         "count": 1
     },
+    "RQ": {
+        "name": "Riches",
+        "type": "blue",
+        "counter": "penniless",
+        "permaEffect": "work",
+        "asset": "assets/cards/blue.riches.png",
+        "count": 1
+    },
+    "D": {
+        "name": "Diplomacy",
+        "type": "blue",
+        "counter": "hostiles",
+        "permaEffect": "escape",
+        "asset": "assets/cards/blue.diplomacy.png",
+        "count": 1
+    },
+    "RA": {
+        "name": "Alternative Routes",
+        "type": "blue",
+        "counter": "lost",
+        "permaEffect": "orientation",
+        "asset": "assets/cards/blue.routes.png",
+        "count": 1
+    },
     "TC": {
         "name": "Civilization",
         "type": "yellow",
@@ -78,19 +102,69 @@
         "asset": "assets/cards/yellow.civilization.png",
         "count": 5
     },
+    "TS": {
+        "name": "Savage Land",
+        "type": "yellow",
+        "terrain": "savage",
+        "asset": "assets/cards/yellow.savage.png",
+        "count": 4
+    },
+    "M": {
+        "name": "Sea",
+        "type": "yellow",
+        "terrain": "sea",
+        "asset": "assets/cards/yellow.sea.png",
+        "count": 4
+    },
+    "SR": {
+        "name": "Desert",
+        "type": "yellow",
+        "terrain": "desert",
+        "asset": "assets/cards/yellow.desert.png",
+        "count": 3
+    },
     "1000": {
         "name": "1000",
         "type": "white",
         "value": 1000,
         "allowed": ["desert", "savage_land", "civilization"],
+        "playable": ["orientation"],
         "asset": "assets/cards/white.walking.png",
         "count": 10
+    },
+    "2000": {
+        "name": "2000",
+        "type": "white",
+        "value": 2000,
+        "allowed": ["savage_land", "civilization"],
+        "playable": ["orientation"],
+        "asset": "assets/cards/white.horse.png",
+        "count": 10
+    },
+    "3000": {
+        "name": "3000",
+        "type": "white",
+        "value": 3000,
+        "allowed": ["sea"],
+        "playable": ["orientation"],
+        "asset": "assets/cards/white.boat.png",
+        "count": 10
+    },
+    "4000": {
+        "name": "4000",
+        "type": "white",
+        "value": 4000,
+        "allowed": ["civilization"],
+        "playable": ["orientation"],
+        "asset": "assets/cards/white.train.png",
+        "count": 12
     },
     "8000": {
         "name": "8000",
         "type": "white",
         "value": 8000,
         "allowed": ["savage_land", "sea", "civilization"],
+        "playable": ["orientation"],
         "asset": "assets/cards/white.balloon.png",
         "count": 4
     }

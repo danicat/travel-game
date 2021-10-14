@@ -21,6 +21,7 @@ type Card struct {
 	Playable    []string
 	Counter     string
 	PermaEffect string
+	Terrain     string
 	Value       int
 	Allowed     []string
 	Count       int

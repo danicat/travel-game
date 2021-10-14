@@ -12,6 +12,8 @@ const (
 	TurnOver
 	Draw
 	Play
+	BeforeTarget
+	Target
 	Counter
 )
 
@@ -31,6 +33,12 @@ func (s State) String() string {
 		return "TurnStart"
 	case TurnOver:
 		return "TurnOver"
+	case Draw:
+		return "Draw"
+	case Play:
+		return "Play"
+	case Target:
+		return "Target"
 	default:
 		return "Unknown"
 	}

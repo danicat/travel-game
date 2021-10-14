@@ -36,7 +36,7 @@ func TestDraw(t *testing.T) {
 	}
 
 	if card.Key != cards[len(cards)-1].Key {
-		t.Fatalf("expected to be the %s card, but got %s", cards[len(cards)-1], card)
+		t.Fatalf("expected to be the %s card, but got %s", cards[len(cards)-1].Key, card.Key)
 	}
 }
 
@@ -82,7 +82,7 @@ func TestNewDeck(t *testing.T) {
 		t.Fatalf("expected no errors, got %s", err)
 	}
 	d := NewDeck(cards)
-	if len(d.cards) != 35 {
-		t.Fatal("expected 35 cards")
+	if len(d.cards) != 112 {
+		t.Fatal("expected 112 cards")
 	}
 }

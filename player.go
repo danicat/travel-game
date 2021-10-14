@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log"
 )
 
 type Player struct {
@@ -20,7 +19,6 @@ func (p *Player) Hand() []Card {
 
 func (p *Player) Draw(d *Deck) error {
 	card, err := d.Draw()
-	log.Printf("card drawn: %v", card)
 	if err != nil {
 		return err
 	}
@@ -65,7 +63,12 @@ func (p *Player) Play(card int) (Card, error) {
 
 func (p *Player) Receive(card Card) error {
 	switch card.Type {
+	case "white":
+		p.score += card.Value
+		p.travel = append(p.travel, card)
 	case "green":
+		p.battle = append(p.battle, card)
+	case "red":
 		p.battle = append(p.battle, card)
 	case "yellow":
 		p.terrain = append(p.terrain, card)
