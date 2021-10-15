@@ -22,15 +22,15 @@ type Config struct {
 	HandSize   int `json:"hand_size"`
 
 	Layout struct {
-		Players  []Rect
-		System   Rect
-		Hand     Rect
-		Terrain  Rect
-		Battle   Rect
-		Travel   Rect
-		Deck     Rect
-		Cemitery Rect
-		Card     Rect
+		Players   []Rect
+		System    Rect
+		Hand      Rect
+		Terrain   Rect
+		Battle    Rect
+		Travel    Rect
+		Deck      Rect
+		Graveyard Rect
+		Card      Rect
 	}
 }
 

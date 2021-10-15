@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func TestInsert(t *testing.T) {
-	cards := []Card{{Key: "O"}, {Key: "FD"}, {Key: "SR"}, {Key: "E"}}
+	cards := []Card{{ID: "O"}, {ID: "FD"}, {ID: "SR"}, {ID: "E"}}
 	deck := Deck{}
 	for _, c := range cards {
 		deck.Insert(c)
@@ -15,7 +15,7 @@ func TestInsert(t *testing.T) {
 }
 
 func TestDraw(t *testing.T) {
-	cards := []Card{{Key: "O"}, {Key: "FD"}, {Key: "SR"}, {Key: "E"}}
+	cards := []Card{{ID: "O"}, {ID: "FD"}, {ID: "SR"}, {ID: "E"}}
 	deck := Deck{}
 	for _, c := range cards {
 		deck.Insert(c)
@@ -35,8 +35,8 @@ func TestDraw(t *testing.T) {
 		t.Fatal("expected deck to have one less card")
 	}
 
-	if card.Key != cards[len(cards)-1].Key {
-		t.Fatalf("expected to be the %s card, but got %s", cards[len(cards)-1].Key, card.Key)
+	if card.ID != cards[len(cards)-1].ID {
+		t.Fatalf("expected to be the %s card, but got %s", cards[len(cards)-1].ID, card.ID)
 	}
 }
 
@@ -51,7 +51,7 @@ func TestDrawNoCards(t *testing.T) {
 }
 
 func TestShuffle(t *testing.T) {
-	cards := []Card{{Key: "O"}, {Key: "FD"}, {Key: "SR"}, {Key: "E"}}
+	cards := []Card{{ID: "O"}, {ID: "FD"}, {ID: "SR"}, {ID: "E"}}
 	deck := Deck{}
 	for _, c := range cards {
 		deck.Insert(c)
@@ -65,7 +65,7 @@ func TestShuffle(t *testing.T) {
 
 	same := true
 	for i := 0; i < len(cards); i++ {
-		if cards[i].Key != deck.cards[i].Key {
+		if cards[i].ID != deck.cards[i].ID {
 			same = false
 			break
 		}
@@ -77,11 +77,11 @@ func TestShuffle(t *testing.T) {
 }
 
 func TestNewDeck(t *testing.T) {
-	cards, err := LoadCards("cards.json")
+	err := LoadCards("cards.json")
 	if err != nil {
 		t.Fatalf("expected no errors, got %s", err)
 	}
-	d := NewDeck(cards)
+	d := NewDeck(Cards)
 	if len(d.cards) != 112 {
 		t.Fatal("expected 112 cards")
 	}

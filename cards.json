@@ -1,171 +1,297 @@
-{
-    "O": {
+[
+    {
+        "id": "O",
         "name": "Orientation",
         "type": "green",
-        "effect": "orientation",
-        "playable": ["lost", "escape", "remedy", "work"],
         "asset": "assets/cards/green.orientation.png",
-        "count": 14
+        "count": 14,
+        "effects": {
+            "status": "oriented"
+        },
+        "constraints": {
+            "target": "self",
+            "status": ["lost", "escaping", "healing", "working"]
+        }
     },
-    "P": {
+    {
+        "id": "P",
         "name": "Lost",
         "type": "red",
-        "effect": "lost",
-        "playable": ["orientation"],
         "asset": "assets/cards/red.lost.png",
-        "count": 5
+        "count": 5,
+        "effects": {
+            "status": "lost"
+        },
+        "constraints": {
+            "target": "opponent",
+            "status": ["oriented"]
+        }
     },
-    "T": {
+    {
+        "id": "T",
         "name": "Work",
         "type": "green",
-        "effect": "work",
-        "playable": ["penniless"],
         "asset": "assets/cards/green.work.png",
-        "count": 6
+        "count": 6,
+
+        "effects": {
+            "status": "working"
+        },
+        "constraints": {
+            "target": "self",
+            "status": ["penniless"]
+        }
     },
-    "FD": {
-        "name": "Penniless",
+    {
+        "id": "FD",
+        "name": "Out of Money",
         "type": "red",
-        "effect": "penniless",
-        "playable": ["orientation"],
         "asset": "assets/cards/red.penniless.png",
-        "count": 3
-    },    
-    "F": {
+        "count": 3,
+        "effects": {
+            "status": "penniless"
+        },
+        "constraints": {
+            "target": "opponent",
+            "status": ["oriented"]
+        }
+    },   
+    {
+        "id": "F",
         "name": "Escape",
         "type": "green",
-        "effect": "escape",
-        "playable": ["hostiles"],
         "asset": "assets/cards/green.escape.png",
-        "count": 6
+        "count": 6,
+
+        "effects": {
+            "status": "escaping"
+        },
+        "constraints": {
+            "target": "self",
+            "status": ["captive"]
+        }
     },
-    "PH": {
+    {
+        "id": "PH",
         "name": "Hostiles",
         "type": "red",
-        "effect": "hostiles",
-        "playable": ["orientation"],
         "asset": "assets/cards/red.hostiles.png",
-        "count": 3
+        "count": 3,
+        "effects": {
+            "status": "captive"
+        },
+        "constraints": {
+            "target": "opponent",
+            "status": ["oriented"]
+        }
     },
-    "R": {
+    {
+        "id": "R",
         "name": "Remedy",
         "type": "green",
-        "effect": "remedy",
-        "playable": ["epidemic"],
         "asset": "assets/cards/green.remedy.png",
-        "count": 6
+        "count": 6,
+        "effects": {
+            "status": "healing"
+        },
+        "constraints": {
+            "target": "self",
+            "status": ["sick"]
+        }
     },
-    "E": {
+    {
+        "id": "E",
         "name": "Epidemic",
         "type": "red",
-        "effect": "epidemic",
-        "playable": ["orientation"],
         "asset": "assets/cards/red.epidemic.png",
-        "count": 3
+        "count": 3,
+        "effects": {
+            "status": "sick"
+        },
+        "constraints": {
+            "target": "opponent",
+            "status": ["oriented"]
+        }
     },
-    "S": {
+    {
+        "id": "S",
         "name": "Health",
         "type": "blue",
-        "counter": "epidemy",
-        "permaEffect": "remedy",
         "asset": "assets/cards/blue.health.png",
-        "count": 1
+        "count": 1,
+        "effects": {
+            "immunity": "sick",
+            "bonus": 4000,
+            "counter_bonus": 12000
+        },
+        "constraints": {
+            "target": "self"
+        }
     },
-    "RQ": {
+    {
+        "id": "R",
         "name": "Riches",
         "type": "blue",
-        "counter": "penniless",
-        "permaEffect": "work",
         "asset": "assets/cards/blue.riches.png",
-        "count": 1
+        "count": 1,
+        "effects": {
+            "immunity": "penniless",
+            "bonus": 4000,
+            "counter_bonus": 12000
+        },
+        "constraints": {
+            "target": "self"
+        }
     },
-    "D": {
+    {
+        "id": "D",
         "name": "Diplomacy",
         "type": "blue",
-        "counter": "hostiles",
-        "permaEffect": "escape",
         "asset": "assets/cards/blue.diplomacy.png",
-        "count": 1
+        "count": 1,
+        "effects": {
+            "immunity": "captive",
+            "bonus": 4000,
+            "counter_bonus": 12000
+        },
+        "constraints": {
+            "target": "self"
+        }        
     },
-    "RA": {
+    {
+        "id": "RA",
         "name": "Alternative Routes",
         "type": "blue",
-        "counter": "lost",
-        "permaEffect": "orientation",
         "asset": "assets/cards/blue.routes.png",
-        "count": 1
+        "count": 1,
+        "effects": {
+            "status": "oriented",
+            "terrain": "any",
+            "immunity": "lost",
+            "bonus": 4000,
+            "counter_bonus": 12000
+        },
+        "constraints": {
+            "target": "self"
+        }          
     },
-    "TC": {
+    {
+        "id": "TC",
         "name": "Civilization",
         "type": "yellow",
-        "terrain": "civilization",
         "asset": "assets/cards/yellow.civilization.png",
-        "count": 5
+        "count": 5,
+        "effects": {
+            "terrain": "civilization"
+        }
     },
-    "TS": {
+    {
+        "id": "TS",
         "name": "Savage Land",
         "type": "yellow",
-        "terrain": "savage_land",
         "asset": "assets/cards/yellow.savage.png",
-        "count": 4
+        "count": 4,
+        "effects": {
+            "terrain": "savage_land"
+        }
     },
-    "M": {
+    {
+        "id": "M",
         "name": "Sea",
         "type": "yellow",
-        "terrain": "sea",
         "asset": "assets/cards/yellow.sea.png",
-        "count": 4
+        "count": 4,
+        "effects": {
+            "terrain": "sea"
+        }
     },
-    "SR": {
+    {
+        "id": "SR",
         "name": "Desert",
         "type": "yellow",
-        "terrain": "desert",
         "asset": "assets/cards/yellow.desert.png",
-        "count": 3
+        "count": 3,
+        "effects": {
+            "terrain": "desert"
+        }   
     },
-    "1000": {
+    {
+        "id": "1000",
         "name": "1000",
         "type": "white",
-        "value": 1000,
-        "allowed": ["desert", "savage_land", "civilization"],
-        "playable": ["orientation"],
         "asset": "assets/cards/white.walking.png",
-        "count": 10
+        "count": 10,
+        "effects": {
+            "distance": 1000
+        },
+        "constraints": {
+            "target": "self",
+            "terrains": ["desert", "savage_land", "civilization"],
+            "status": ["oriented"]
+        }
     },
-    "2000": {
+    {
+        "id": "2000",
         "name": "2000",
         "type": "white",
         "value": 2000,
-        "allowed": ["savage_land", "civilization"],
-        "playable": ["orientation"],
         "asset": "assets/cards/white.horse.png",
-        "count": 10
+        "count": 10,
+        "effects": {
+            "distance": 2000
+        },
+        "constraints": {
+            "target": "self",
+            "terrains": ["savage_land", "civilization"],
+            "status": ["oriented"]
+        }
     },
-    "3000": {
+    {
+        "id": "3000",
         "name": "3000",
         "type": "white",
         "value": 3000,
-        "allowed": ["sea"],
-        "playable": ["orientation"],
         "asset": "assets/cards/white.boat.png",
-        "count": 10
+        "count": 10,
+        "effects": {
+            "distance": 3000
+        },
+        "constraints": {
+            "target": "self",
+            "terrains": ["savage_land", "civilization"],
+            "status": ["oriented"]
+        }
     },
-    "4000": {
+    {
+        "id": "4000",
         "name": "4000",
         "type": "white",
         "value": 4000,
-        "allowed": ["civilization"],
-        "playable": ["orientation"],
         "asset": "assets/cards/white.train.png",
-        "count": 12
+        "count": 12,
+        "effects": {
+            "distance": 4000
+        },
+        "constraints": {
+            "target": "self",
+            "terrains": ["civilization"],
+            "status": ["oriented"]
+        }
     },
-    "8000": {
+    {
+        "id": "8000",
         "name": "8000",
         "type": "white",
         "value": 8000,
-        "allowed": ["savage_land", "sea", "civilization"],
-        "playable": ["orientation"],
         "asset": "assets/cards/white.balloon.png",
-        "count": 4
+        "count": 4,
+        "effects": {
+            "distance": 8000
+        },
+        "constraints": {
+            "target": "self",
+            "terrains": ["savage_land", "sea", "civilization"],
+            "status": ["oriented"]
+        }
     }
-}
+]

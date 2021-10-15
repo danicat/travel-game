@@ -24,13 +24,13 @@ func TestDealPhase(t *testing.T) {
 	}
 
 	for i := 0; i < config.MaxPlayers; i++ {
-		if len(game.players[i].hand) != config.HandSize {
-			t.Fatalf("player %d hand size should be %d, got %d", i, config.HandSize, len(game.players[i].hand))
+		if len(game.players.All()[i].hand) != config.HandSize {
+			t.Fatalf("player %d hand size should be %d, got %d", i, config.HandSize, len(game.players.All()[i].hand))
 		}
 	}
 }
 
-func TestStateTransitions(t *testing.T) {
+func TestStateInputlessTransitions(t *testing.T) {
 	err := LoadConfig("config.json")
 	if err != nil {
 		t.Fatal(err)
@@ -75,7 +75,7 @@ func TestStateTransitions(t *testing.T) {
 
 	for _, testcase := range tbl {
 		t.Run(fmt.Sprintf("transition from %s to %s", testcase.beforeState, testcase.afterState), func(t *testing.T) {
-			game.currentPlayer = testcase.beforePlayer
+			game.players.Current().Id = testcase.beforePlayer
 			game.state = testcase.beforeState
 			game.Update()
 
@@ -83,10 +83,9 @@ func TestStateTransitions(t *testing.T) {
 				t.Fatalf("expected state %s, got %s", testcase.afterState, game.state)
 			}
 
-			if game.currentPlayer != testcase.afterPlayer {
-				t.Fatalf("expected player %d, got %d", testcase.afterPlayer, game.currentPlayer)
+			if game.players.Current().Id != testcase.afterPlayer {
+				t.Fatalf("expected player %d, got %d", testcase.afterPlayer, game.players.Current().Id)
 			}
-
 		})
 	}
 }

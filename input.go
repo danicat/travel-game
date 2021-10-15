@@ -43,6 +43,9 @@ func NewKBHandler() *KeyboardHandler {
 			if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 				ch <- KeyOpponentOrGraveyard
 			}
+			if inpututil.IsKeyJustPressed(ebiten.KeyG) {
+				ch <- KeyGraveyard
+			}
 			if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 				ch <- KeyLeft
 			}
@@ -75,4 +78,29 @@ func (ih *KeyboardHandler) Read() Input {
 		input = KeyNone
 	}
 	return input
+}
+
+type MockHandler struct {
+	keys []Input
+}
+
+func NewMockHandler() *MockHandler {
+	return &MockHandler{}
+}
+
+func (mh *MockHandler) AppendKeys(keys []Input) {
+	mh.keys = append(mh.keys, keys...)
+}
+
+func (mh *MockHandler) Read() Input {
+	if len(mh.keys) == 0 {
+		return KeyNone
+	}
+	key := mh.keys[0]
+	mh.keys = mh.keys[1:]
+	return key
+}
+
+func (mh *MockHandler) Cancel() {
+
 }

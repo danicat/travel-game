@@ -9,7 +9,7 @@ type Deck struct {
 	cards []Card
 }
 
-func NewDeck(cards map[string]Card) *Deck {
+func NewDeck(cards []Card) *Deck {
 	var d Deck
 	for _, card := range cards {
 		for i := 0; i < card.Count; i++ {
