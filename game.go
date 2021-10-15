@@ -9,7 +9,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
@@ -25,11 +24,12 @@ type Game struct {
 	cemitery []Card
 	cardBack *ebiten.Image
 
-	// Gane State
+	// Game State
 	currentPlayer int
-	target        int
 	cardSelected  int
 	currentCard   Card
+
+	input InputHandler
 
 	op ebiten.DrawImageOptions
 	// timeout sync.Once
@@ -55,6 +55,10 @@ func NewGame(maxPlayers, handSize int) (*Game, error) {
 	}
 	game.cardBack = img
 
+	game.state = GameStart
+
+	game.input = NewKBHandler()
+
 	return &game, nil
 }
 
@@ -79,11 +83,6 @@ func (g *Game) Deal() {
 }
 
 func (g *Game) Update() error {
-	// g.timeout.Do(func() {
-	// 	time.AfterFunc(time.Second*60, func() {
-	// 		g.state = GameOver
-	// 	})
-	// })
 	switch g.state {
 	case GameStart:
 		g.InitDeck()
@@ -92,7 +91,7 @@ func (g *Game) Update() error {
 	case TurnStart:
 		g.state = Draw
 	case Draw:
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		if key := g.input.Read(); key == KeySelfOrGraveyard {
 			err := g.players[g.currentPlayer].Draw(g.deck)
 			if err != nil {
 				g.state = GameOver
@@ -100,66 +99,40 @@ func (g *Game) Update() error {
 			g.state = Play
 		}
 	case Play:
-		if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+		key := g.input.Read()
+		switch key {
+		case KeyLeft:
 			if g.cardSelected <= 0 {
 				g.cardSelected = len(g.players[g.currentPlayer].hand) - 1
 			} else {
 				g.cardSelected--
 			}
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+
+		case KeyRight:
 			if g.cardSelected < len(g.players[g.currentPlayer].hand)-1 {
 				g.cardSelected++
 			} else {
 				g.cardSelected = 0
 			}
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+
+		case KeySelfOrGraveyard:
 			card, err := g.players[g.currentPlayer].Play(g.cardSelected)
 			if err != nil {
 				log.Printf("error playing card %s: %s", card.Key, err)
 			}
 			g.currentCard = card
 
-			g.state = BeforeTargetSelection
-		}
-	case BeforeTargetSelection:
-		switch g.currentCard.Type {
-		case "red":
-			g.target = (g.currentPlayer + 1) % 2
-		default:
-			g.target = g.currentPlayer
-		}
-		g.state = TargetSelection
+			g.Play(card, g.currentPlayer)
+			g.state = TurnOver
 
-	case TargetSelection:
-		if inpututil.IsKeyJustPressed(ebiten.KeyUp) || inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-			switch g.currentCard.Type {
-			case "yellow":
-				g.target = (g.target + 1) % 2
-			case "red":
-				// oponent x graveyard
-				if g.target == -1 {
-					g.target = (g.currentPlayer + 1) % 2
-				} else {
-					g.target = -1
-				}
-
-			default:
-				// self x graveyard
-				if g.target == g.currentPlayer {
-					g.target = -1
-				} else {
-					g.target = g.currentPlayer
-				}
-			}
-		}
-
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-			err := g.Play(g.currentCard, g.target)
+		case KeyOpponentOrGraveyard:
+			card, err := g.players[g.currentPlayer].Play(g.cardSelected)
 			if err != nil {
-				log.Printf("error playing card %s: %s", g.currentCard.Key, err)
+				log.Printf("error playing card %s: %s", card.Key, err)
 			}
+			g.currentCard = card
+
+			g.Play(card, (g.currentPlayer+1)%2)
 			g.state = TurnOver
 		}
 
@@ -168,6 +141,7 @@ func (g *Game) Update() error {
 		g.cardSelected = 0
 		g.state = TurnStart
 	case GameOver:
+		g.input.Cancel()
 		os.Exit(0)
 	}
 	// time.Sleep(time.Millisecond * 100)
@@ -261,20 +235,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.op.GeoM.Scale(scale, scale)
 		g.op.GeoM.Translate(config.Layout.Hand.StartX+float64(i)*config.Layout.Card.Width, config.Layout.Hand.StartY)
 		screen.DrawImage(c.image, &g.op)
-	}
-
-	switch g.state {
-	case TargetSelection:
-		var choice string
-		switch g.target {
-		case -1:
-			choice = "graveyard"
-		case g.currentPlayer:
-			choice = "self"
-		default:
-			choice = "oponent"
-		}
-		text.Draw(screen, choice, ttfRoboto, config.ScreenWidth/2, config.ScreenHeight/2, color.White)
 	}
 }
 
