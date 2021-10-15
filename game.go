@@ -16,10 +16,11 @@ import (
 const HandSize = 6
 
 type Game struct {
-	state   State
-	deck    *Deck
-	cards   map[string]Card
-	players []*Player
+	state    State
+	deck     *Deck
+	cards    map[string]Card
+	players  []*Player
+	handSize int
 
 	cemitery []Card
 	cardBack *ebiten.Image
@@ -34,23 +35,27 @@ type Game struct {
 	// timeout sync.Once
 }
 
-func NewGame() (*Game, error) {
+func NewGame(maxPlayers, handSize int) (*Game, error) {
+	var game Game
 	cards, err := LoadCards("cards.json")
 	if err != nil {
 		return nil, err
 	}
+	game.cards = cards
 
-	players := []*Player{
-		{},
-		{},
+	for i := 0; i < maxPlayers; i++ {
+		game.players = append(game.players, &Player{})
 	}
+
+	game.handSize = handSize
 
 	img, _, err := ebitenutil.NewImageFromFile("assets/cards/back.png")
 	if err != nil {
 		return nil, err
 	}
+	game.cardBack = img
 
-	return &Game{cards: cards, state: GameStart, players: players, cardBack: img}, nil
+	return &game, nil
 }
 
 func (g *Game) InitDeck() {
@@ -60,10 +65,10 @@ func (g *Game) InitDeck() {
 	g.deck = deck
 }
 
-func (g *Game) Deal(handSize int) {
+func (g *Game) Deal() {
 	log.Println("dealing cards")
 	log.Printf("players: %d", len(g.players))
-	for i := 0; i < handSize; i++ {
+	for i := 0; i < g.handSize; i++ {
 		for _, p := range g.players {
 			err := p.Draw(g.deck)
 			if err != nil {
@@ -82,7 +87,7 @@ func (g *Game) Update() error {
 	switch g.state {
 	case GameStart:
 		g.InitDeck()
-		g.Deal(HandSize)
+		g.Deal()
 		g.state = TurnStart
 	case TurnStart:
 		g.state = Draw
@@ -116,18 +121,18 @@ func (g *Game) Update() error {
 			}
 			g.currentCard = card
 
-			g.state = Target
+			g.state = BeforeTargetSelection
 		}
-	case BeforeTarget:
+	case BeforeTargetSelection:
 		switch g.currentCard.Type {
 		case "red":
 			g.target = (g.currentPlayer + 1) % 2
 		default:
 			g.target = g.currentPlayer
 		}
-		g.state = Target
+		g.state = TargetSelection
 
-	case Target:
+	case TargetSelection:
 		if inpututil.IsKeyJustPressed(ebiten.KeyUp) || inpututil.IsKeyJustPressed(ebiten.KeyDown) {
 			switch g.currentCard.Type {
 			case "yellow":
@@ -259,7 +264,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	switch g.state {
-	case Target:
+	case TargetSelection:
 		var choice string
 		switch g.target {
 		case -1:

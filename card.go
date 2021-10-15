@@ -28,6 +28,20 @@ type Card struct {
 	image       *ebiten.Image
 }
 
+type Constraint struct {
+	Terrain []string
+	Status  []string
+	Target  Target
+}
+
+type Target int
+
+const (
+	Self Target = iota
+	Opponent
+	Graveyard
+)
+
 func LoadCards(file string) (map[string]Card, error) {
 	var cards map[string]Card
 

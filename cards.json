@@ -105,7 +105,7 @@
     "TS": {
         "name": "Savage Land",
         "type": "yellow",
-        "terrain": "savage",
+        "terrain": "savage_land",
         "asset": "assets/cards/yellow.savage.png",
         "count": 4
     },

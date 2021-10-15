@@ -1,6 +1,8 @@
 {
     "screen_width": 1024,
     "screen_height": 768,
+
+    "max_players": 2,
     "hand_size": 6,
 
     "layout": {

@@ -7,12 +7,12 @@ import (
 )
 
 func main() {
-	game, err := NewGame()
+	err := LoadConfig("config.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	config, err = LoadConfig("config.json")
+	game, err := NewGame(config.MaxPlayers, config.HandSize)
 	if err != nil {
 		log.Fatal(err)
 	}

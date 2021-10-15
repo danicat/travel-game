@@ -17,7 +17,9 @@ type Rect struct {
 type Config struct {
 	ScreenWidth  int `json:"screen_width"`
 	ScreenHeight int `json:"screen_height"`
-	HandSize     int `json:"hand_size"`
+
+	MaxPlayers int `json:"max_players"`
+	HandSize   int `json:"hand_size"`
 
 	Layout struct {
 		Players  []Rect
@@ -34,23 +36,21 @@ type Config struct {
 
 var config Config
 
-func LoadConfig(file string) (Config, error) {
-	var config Config
-
+func LoadConfig(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		return config, fmt.Errorf("unable to open file: %s", err)
+		return fmt.Errorf("unable to open file: %s", err)
 	}
 
 	b, err := ioutil.ReadAll(f)
 	if err != nil {
-		return config, fmt.Errorf("unable to read file: %s", err)
+		return fmt.Errorf("unable to read file: %s", err)
 	}
 
 	err = json.Unmarshal(b, &config)
 	if err != nil {
-		return config, fmt.Errorf("error parsing json: %s", err)
+		return fmt.Errorf("error parsing json: %s", err)
 	}
 
-	return config, nil
+	return nil
 }
