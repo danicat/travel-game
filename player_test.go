@@ -9,20 +9,19 @@ import (
 func TestPlay(t *testing.T) {
 	LoadCards("cards.json")
 	tbl := []struct {
-		name            string
-		beforeCards     []string
-		afterStatus     Status
-		afterDistance   int
-		afterTerrain    string
-		afterImmunities []Status
+		name          string
+		beforeCards   []string
+		afterStatus   Status
+		afterDistance int
+		afterTerrain  string
 	}{
+		// No cards
 		{
 			"should be lost",
 			[]string{},
 			StatusLost,
 			0,
 			"",
-			nil,
 		},
 		// Green card effects
 		{
@@ -31,7 +30,34 @@ func TestPlay(t *testing.T) {
 			StatusOriented,
 			0,
 			"",
-			nil,
+		},
+		{
+			"should be oriented",
+			[]string{"O", "P", "O"},
+			StatusOriented,
+			0,
+			"",
+		},
+		{
+			"should be escaping",
+			[]string{"O", "PH", "F"},
+			StatusEscaping,
+			0,
+			"",
+		},
+		{
+			"should be working",
+			[]string{"O", "FD", "T"},
+			StatusWorking,
+			0,
+			"",
+		},
+		{
+			"should be healing",
+			[]string{"O", "E", "R"},
+			StatusHealing,
+			0,
+			"",
 		},
 		// Red card effects
 		{
@@ -40,7 +66,6 @@ func TestPlay(t *testing.T) {
 			StatusLost,
 			0,
 			"",
-			nil,
 		},
 		{
 			"should be captive",
@@ -48,7 +73,6 @@ func TestPlay(t *testing.T) {
 			StatusCaptive,
 			0,
 			"",
-			nil,
 		},
 		{
 			"should be penniless",
@@ -56,7 +80,6 @@ func TestPlay(t *testing.T) {
 			StatusPenniless,
 			0,
 			"",
-			nil,
 		},
 		{
 			"should be sick",
@@ -64,7 +87,28 @@ func TestPlay(t *testing.T) {
 			StatusSick,
 			0,
 			"",
-			nil,
+		},
+		// Should be oriented (RA)
+		{
+			"should be oriented (RA)",
+			[]string{"RA", "PH", "F"},
+			StatusOriented,
+			0,
+			"",
+		},
+		{
+			"should be oriented (RA)",
+			[]string{"RA", "FD", "T"},
+			StatusOriented,
+			0,
+			"",
+		},
+		{
+			"should be oriented (RA)",
+			[]string{"RA", "E", "R"},
+			StatusOriented,
+			0,
+			"",
 		},
 		// Blue card status cancel
 		{
@@ -73,7 +117,6 @@ func TestPlay(t *testing.T) {
 			StatusOriented,
 			0,
 			"",
-			nil,
 		},
 		{
 			"should be oriented (RA)",
@@ -81,7 +124,6 @@ func TestPlay(t *testing.T) {
 			StatusOriented,
 			0,
 			"",
-			nil,
 		},
 		// Blue card immunities
 		{
@@ -90,7 +132,6 @@ func TestPlay(t *testing.T) {
 			StatusOriented,
 			0,
 			"",
-			nil,
 		},
 		{
 			"should be immune to captive",
@@ -98,7 +139,6 @@ func TestPlay(t *testing.T) {
 			StatusOriented,
 			0,
 			"",
-			nil,
 		},
 		{
 			"should be immune to penniless",
@@ -106,7 +146,6 @@ func TestPlay(t *testing.T) {
 			StatusOriented,
 			0,
 			"",
-			nil,
 		},
 		{
 			"should be immune to sick",
@@ -114,7 +153,106 @@ func TestPlay(t *testing.T) {
 			StatusOriented,
 			0,
 			"",
-			nil,
+		},
+		// Yellow cards
+		{
+			"should be desert",
+			[]string{"SR"},
+			StatusLost,
+			0,
+			"desert",
+		},
+		{
+			"should be desert",
+			[]string{"TC", "SR"},
+			StatusLost,
+			0,
+			"desert",
+		},
+		{
+			"should be civilization",
+			[]string{"SR", "TC"},
+			StatusLost,
+			0,
+			"civilization",
+		},
+		{
+			"should be savage land",
+			[]string{"SR", "TC", "TS"},
+			StatusLost,
+			0,
+			"savage_land",
+		},
+		{
+			"should be sea",
+			[]string{"SR", "TC", "TS", "M"},
+			StatusLost,
+			0,
+			"sea",
+		},
+		{
+			"should be no terrain (RA)",
+			[]string{"SR", "TC", "TS", "M", "RA"},
+			StatusOriented,
+			0,
+			"",
+		},
+		{
+			"should be no terrain (RA)",
+			[]string{"RA", "SR", "TC", "TS", "M"},
+			StatusOriented,
+			0,
+			"",
+		},
+		// White cards
+		{
+			"1000",
+			[]string{"O", "1000"},
+			StatusOriented,
+			1000,
+			"",
+		},
+		{
+			"1000",
+			[]string{"O", "SR", "1000"},
+			StatusOriented,
+			1000,
+			"",
+		},
+		{
+			"1000",
+			[]string{"O", "TS", "1000"},
+			StatusOriented,
+			1000,
+			"",
+		},
+		{
+			"1000",
+			[]string{"O", "TC", "1000"},
+			StatusOriented,
+			1000,
+			"",
+		},
+		{
+			"0",
+			[]string{"O", "M", "1000"},
+			StatusOriented,
+			0,
+			"",
+		},
+		{
+			"0",
+			[]string{"O", "SR", "P", "1000"},
+			StatusLost,
+			0,
+			"",
+		},
+		{
+			"1000",
+			[]string{"O", "M", "P", "RA", "1000"},
+			StatusOriented,
+			1000,
+			"",
 		},
 	}
 
@@ -123,6 +261,10 @@ func TestPlay(t *testing.T) {
 			p := Player{Name: "testplayer"}
 			for _, c := range tc.beforeCards {
 				card := FindCardByID(c)
+				if card == nil {
+					t.Fatalf("card not found %s", c)
+				}
+
 				err := p.Receive(nil, *card)
 				if err != nil {
 					log.Println(err)

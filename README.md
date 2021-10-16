@@ -11,6 +11,8 @@ A remake of an 80's card game classic "Around the World" (pt-br: "Volta ao Mundo
 - Improve test coverage
 - Add round end condition
 - Add game end condition
+- AI
+- Hide player 2 hand
 
 # Talking points
 
