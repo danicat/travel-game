@@ -52,6 +52,10 @@
         "card": {
             "width": 120,
             "height": 160
+        },
+        "defense": {
+            "startX": 800,
+            "startY": 0
         }
     }
 }

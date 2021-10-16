@@ -28,7 +28,6 @@ type Game struct {
 	input InputHandler
 
 	op ebiten.DrawImageOptions
-	// timeout sync.Once
 }
 
 func NewGame(maxPlayers, handSize int) (*Game, error) {
@@ -121,7 +120,7 @@ func (g *Game) Update() error {
 			}
 			g.currentCard = card
 
-			g.Play(g.players.Current(), g.players.Next(), card)
+			g.Play(g.players.Current(), g.players.PeekNext(), card)
 			g.state = TurnOver
 
 		case KeyGraveyard:
@@ -156,6 +155,7 @@ func (g *Game) Play(from *Player, to *Player, card Card) error {
 
 	err := to.Receive(from, card)
 	if err != nil {
+		log.Println(err)
 		g.graveyard = append(g.graveyard, card)
 		return err
 	}
@@ -164,7 +164,7 @@ func (g *Game) Play(from *Player, to *Player, card Card) error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	text.Draw(screen, fmt.Sprintf("%s | Score: %d Phase: %s", g.players.Current().Name, g.players.Current().Score, g.state), ttfRoboto, 0, config.ScreenHeight-24, color.White)
+	text.Draw(screen, fmt.Sprintf("%s | Distance: %d Phase: %s", g.players.Current().Name, g.players.Current().Distance, g.state), ttfRoboto, 0, config.ScreenHeight-24, color.White)
 
 	g.op.GeoM.Reset()
 	g.op.GeoM.Scale(.10, .14)
@@ -201,6 +201,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			screen.DrawImage(c.image, &g.op)
 			g.op.GeoM.Translate(20, 0)
 
+		}
+
+		g.op.GeoM.Reset()
+		g.op.GeoM.Scale(.10, .10)
+		g.op.GeoM.Translate(config.Layout.Players[i].StartX+config.Layout.Defense.StartX, config.Layout.Players[i].StartY+config.Layout.Defense.StartY)
+
+		for _, c := range g.players.All()[i].Defense() {
+			screen.DrawImage(c.image, &g.op)
+			g.op.GeoM.Translate(config.Layout.Card.Width, 0)
 		}
 	}
 

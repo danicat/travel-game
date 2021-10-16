@@ -31,6 +31,7 @@ type Config struct {
 		Deck      Rect
 		Graveyard Rect
 		Card      Rect
+		Defense   Rect
 	}
 }
 
