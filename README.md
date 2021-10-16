@@ -3,20 +3,14 @@ A remake of an 80's card game classic "Around the World" (pt-br: "Volta ao Mundo
 
 # TODO
 
-- Blue card mechanics
-- Refactor Card Effects
-- Refactor Card Constraints
 - Refactor Card drawing
 - Background
 - Animation
 - Refactor inputs to support gamepad
 - Refactor controls to add card zoom / description
 - Improve test coverage
-- BUG: Player can play red cards on themselves
 - Add round end condition
 - Add game end condition
-- Move card select to Player / Hand object
-- Get rid of card rules by type - use constraints and effects instead
 
 # Talking points
 

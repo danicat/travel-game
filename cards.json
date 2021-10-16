@@ -129,7 +129,7 @@
         }
     },
     {
-        "id": "R",
+        "id": "RQ",
         "name": "Riches",
         "type": "blue",
         "asset": "assets/cards/blue.riches.png",
@@ -165,8 +165,6 @@
         "asset": "assets/cards/blue.routes.png",
         "count": 1,
         "effects": {
-            "status": "oriented",
-            "terrain": "any",
             "immunity": "lost",
             "bonus": 4000,
             "counter_bonus": 12000
@@ -258,7 +256,7 @@
         },
         "constraints": {
             "target": "self",
-            "terrains": ["savage_land", "civilization"],
+            "terrains": ["sea"],
             "status": ["oriented"]
         }
     },

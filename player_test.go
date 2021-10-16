@@ -6,98 +6,135 @@ import (
 	"testing"
 )
 
-func TestTravel(t *testing.T) {
+func TestPlay(t *testing.T) {
+	LoadCards("cards.json")
 	tbl := []struct {
-		status           Status
-		startDistance    int
-		startTerrain     string
-		cardName         string
-		cardDistance     int
-		terrains         []string
-		expectedDistance int
+		name            string
+		beforeCards     []string
+		afterStatus     Status
+		afterDistance   int
+		afterTerrain    string
+		afterImmunities []Status
 	}{
 		{
-			StatusOriented,
-			0,
-			"desert",
-			"1000",
-			1000,
-			[]string{"desert"},
-			1000,
-		},
-		{
-			StatusOriented,
-			0,
-			"sea",
-			"1000",
-			1000,
-			[]string{"desert"},
-			0,
-		},
-		{
-			StatusEscaping,
-			0,
-			"desert",
-			"1000",
-			1000,
-			[]string{"desert"},
-			0,
-		},
-		{
-			StatusOriented,
-			0,
-			"desert",
-			"2000",
-			2000,
-			[]string{"savage_land", "civilization"},
-			0,
-		},
-		{
+			"should be lost",
+			[]string{},
 			StatusLost,
 			0,
-			"civilization",
-			"4000",
-			4000,
-			[]string{"civilization"},
+			"",
+			nil,
+		},
+		// Green card effects
+		{
+			"should be oriented",
+			[]string{"O"},
+			StatusOriented,
 			0,
+			"",
+			nil,
+		},
+		// Red card effects
+		{
+			"should be lost",
+			[]string{"O", "P"},
+			StatusLost,
+			0,
+			"",
+			nil,
+		},
+		{
+			"should be captive",
+			[]string{"O", "PH"},
+			StatusCaptive,
+			0,
+			"",
+			nil,
+		},
+		{
+			"should be penniless",
+			[]string{"O", "FD"},
+			StatusPenniless,
+			0,
+			"",
+			nil,
+		},
+		{
+			"should be sick",
+			[]string{"O", "E"},
+			StatusSick,
+			0,
+			"",
+			nil,
+		},
+		// Blue card status cancel
+		{
+			"should be oriented (RA)",
+			[]string{"RA"},
+			StatusOriented,
+			0,
+			"",
+			nil,
+		},
+		{
+			"should be oriented (RA)",
+			[]string{"O", "P", "RA"},
+			StatusOriented,
+			0,
+			"",
+			nil,
+		},
+		// Blue card immunities
+		{
+			"should be immune to lost",
+			[]string{"O", "RA", "P"},
+			StatusOriented,
+			0,
+			"",
+			nil,
+		},
+		{
+			"should be immune to captive",
+			[]string{"O", "D", "PH"},
+			StatusOriented,
+			0,
+			"",
+			nil,
+		},
+		{
+			"should be immune to penniless",
+			[]string{"O", "RQ", "FD"},
+			StatusOriented,
+			0,
+			"",
+			nil,
+		},
+		{
+			"should be immune to sick",
+			[]string{"O", "S", "E"},
+			StatusOriented,
+			0,
+			"",
+			nil,
 		},
 	}
 
 	for _, tc := range tbl {
-		t.Run(fmt.Sprintf("status %s terrain %s travel distance %d", tc.status, tc.startTerrain, tc.expectedDistance), func(t *testing.T) {
-			p := Player{Status: tc.status}
-
-			terrainCard := Card{
-				Type: TypeYellow,
-				Effects: Effects{
-					Terrain: tc.startTerrain,
-				},
+		t.Run(fmt.Sprintf(tc.name), func(t *testing.T) {
+			p := Player{Name: "testplayer"}
+			for _, c := range tc.beforeCards {
+				card := FindCardByID(c)
+				err := p.Receive(nil, *card)
+				if err != nil {
+					log.Println(err)
+				}
 			}
 
-			travelCard := Card{
-				Name: tc.cardName,
-				Type: TypeWhite,
-				Effects: Effects{
-					Distance: tc.cardDistance,
-				},
-				Constraints: Constraints{
-					Status:   []Status{StatusOriented},
-					Terrains: tc.terrains,
-				},
+			if p.Status() != tc.afterStatus {
+				t.Errorf("status should be %s, got %s", tc.afterStatus, p.Status())
 			}
 
-			log.Println(tc.status.String())
-
-			err := p.Receive(&p, terrainCard)
-			if err != nil {
-				t.Fatalf("expected no errors, got %s", err)
-			}
-
-			err = p.Receive(&p, travelCard)
-			log.Println(err)
-
-			if p.Distance != tc.expectedDistance {
-				t.Fatalf("expected %d distance, got %d", tc.expectedDistance, p.Distance)
+			if p.Distance != tc.afterDistance {
+				t.Errorf("distance should be %d, got %d", tc.afterDistance, p.Distance)
 			}
 		})
 	}

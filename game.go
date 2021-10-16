@@ -21,10 +21,6 @@ type Game struct {
 	graveyard []Card
 	cardBack  *ebiten.Image
 
-	// Game State
-	cardSelected int
-	currentCard  Card
-
 	input InputHandler
 
 	op ebiten.DrawImageOptions
@@ -90,45 +86,34 @@ func (g *Game) Update() error {
 	case Play:
 		switch key := g.input.Read(); key {
 		case KeyLeft:
-			if g.cardSelected <= 0 {
-				g.cardSelected = len(g.players.Current().hand) - 1
-			} else {
-				g.cardSelected--
-			}
+			g.players.Current().hand.Left()
 
 		case KeyRight:
-			if g.cardSelected < len(g.players.Current().hand)-1 {
-				g.cardSelected++
-			} else {
-				g.cardSelected = 0
-			}
+			g.players.Current().hand.Right()
 
 		case KeySelfOrGraveyard:
-			card, err := g.players.Current().Play(g.cardSelected)
+			card, err := g.players.Current().Play()
 			if err != nil {
 				log.Printf("error playing card %s: %s", card.ID, err)
 			}
-			g.currentCard = card
 
 			g.Play(g.players.Current(), g.players.Current(), card)
 			g.state = TurnOver
 
 		case KeyOpponentOrGraveyard:
-			card, err := g.players.Current().Play(g.cardSelected)
+			card, err := g.players.Current().Play()
 			if err != nil {
 				log.Printf("error playing card %s: %s", card.ID, err)
 			}
-			g.currentCard = card
 
 			g.Play(g.players.Current(), g.players.PeekNext(), card)
 			g.state = TurnOver
 
 		case KeyGraveyard:
-			card, err := g.players.Current().Play(g.cardSelected)
+			card, err := g.players.Current().Play()
 			if err != nil {
 				log.Printf("error playing card %s: %s", card.ID, err)
 			}
-			g.currentCard = card
 
 			g.Play(g.players.Current(), nil, card)
 
@@ -137,13 +122,12 @@ func (g *Game) Update() error {
 
 	case TurnOver:
 		g.players.Next()
-		g.cardSelected = 0
 		g.state = TurnStart
 	case GameOver:
 		g.input.Cancel()
 		os.Exit(0)
 	}
-	// time.Sleep(time.Millisecond * 100)
+
 	return nil
 }
 
@@ -197,7 +181,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.op.GeoM.Scale(.10, .10)
 		g.op.GeoM.Translate(config.Layout.Players[i].StartX+config.Layout.Travel.StartX, config.Layout.Players[i].StartY+config.Layout.Travel.StartY)
 
-		for _, c := range g.players.All()[i].travel {
+		for _, c := range g.players.All()[i].travel.All() {
 			screen.DrawImage(c.image, &g.op)
 			g.op.GeoM.Translate(20, 0)
 
@@ -216,7 +200,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for i, c := range g.players.Current().Hand() {
 		g.op.GeoM.Reset()
 		var scale float64
-		if g.state == Play && g.cardSelected == i {
+		if g.state == Play && g.players.Current().hand.selected == i {
 			scale = .12
 		} else {
 			scale = .10

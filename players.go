@@ -18,7 +18,7 @@ func NewPlayers(numPlayers int) *Players {
 	var players []*Player
 	for i := 0; i < numPlayers; i++ {
 		name := fmt.Sprintf("Player %d", i+1)
-		players = append(players, &Player{Id: i, Name: name, Status: StatusLost})
+		players = append(players, &Player{Id: i, Name: name})
 	}
 	return &Players{players: players}
 }

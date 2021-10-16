@@ -76,3 +76,12 @@ func LoadCards(file string) error {
 func (c *Card) String() string {
 	return c.ID
 }
+
+func FindCardByID(id string) *Card {
+	for _, c := range Cards {
+		if c.ID == id {
+			return &c
+		}
+	}
+	return nil
+}

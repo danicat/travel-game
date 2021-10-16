@@ -24,8 +24,8 @@ func TestDealPhase(t *testing.T) {
 	}
 
 	for i := 0; i < config.MaxPlayers; i++ {
-		if len(game.players.All()[i].hand) != config.HandSize {
-			t.Fatalf("player %d hand size should be %d, got %d", i, config.HandSize, len(game.players.All()[i].hand))
+		if len(game.players.All()[i].hand.All()) != config.HandSize {
+			t.Fatalf("player %d hand size should be %d, got %d", i, config.HandSize, len(game.players.All()[i].hand.All()))
 		}
 	}
 }
