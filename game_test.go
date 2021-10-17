@@ -11,12 +11,12 @@ func TestDealPhase(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	game, err := NewGame(config.MaxPlayers, config.HandSize)
+	game, err := NewGame(nil, config.MaxPlayers, config.HandSize)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	game.state = GameStart
+	game.state = RoundStart
 	game.Update()
 
 	if game.state != TurnStart {
@@ -36,7 +36,7 @@ func TestStateInputlessTransitions(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	game, err := NewGame(config.MaxPlayers, config.HandSize)
+	game, err := NewGame(nil, config.MaxPlayers, config.HandSize)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,6 +51,12 @@ func TestStateInputlessTransitions(t *testing.T) {
 			0,
 			0,
 			GameStart,
+			RoundStart,
+		},
+		{
+			0,
+			0,
+			RoundStart,
 			TurnStart,
 		},
 		{
@@ -71,6 +77,12 @@ func TestStateInputlessTransitions(t *testing.T) {
 			TurnOver,
 			TurnStart,
 		},
+		{
+			0,
+			0,
+			RoundOver,
+			GameOver,
+		},
 	}
 
 	for _, testcase := range tbl {
@@ -85,6 +97,54 @@ func TestStateInputlessTransitions(t *testing.T) {
 
 			if game.players.Current().ID != testcase.afterPlayer {
 				t.Fatalf("expected player %d, got %d", testcase.afterPlayer, game.players.Current().ID)
+			}
+		})
+	}
+}
+
+func TestStateTransitions(t *testing.T) {
+	err := LoadConfig("config.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tbl := []struct {
+		name        string
+		beforeState State
+		inputs      []Input
+		afterState  State
+	}{
+		{
+			"should draw a card",
+			Draw,
+			[]Input{KeyDefaultOrGraveyard},
+			Play,
+		},
+		{
+			"should play a card",
+			Play,
+			[]Input{KeyDefaultOrGraveyard},
+			TurnOver,
+		},
+	}
+
+	for _, testcase := range tbl {
+		t.Run(testcase.name, func(t *testing.T) {
+			input := NewMockHandler()
+
+			game, err := NewGame(input, config.MaxPlayers, config.HandSize)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			input.AppendKeys(testcase.inputs)
+			game.state = testcase.beforeState
+			game.InitDeck()
+			game.Deal()
+			game.Update()
+
+			if game.state != testcase.afterState {
+				t.Fatalf("expected state %s, got %s", testcase.afterState, game.state)
 			}
 		})
 	}

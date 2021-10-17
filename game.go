@@ -21,7 +21,7 @@ type Game struct {
 	handSize  int
 }
 
-func NewGame(maxPlayers, handSize int) (*Game, error) {
+func NewGame(input InputHandler, maxPlayers, handSize int) (*Game, error) {
 	err := LoadCards("cards.json")
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func NewGame(maxPlayers, handSize int) (*Game, error) {
 		state:     GameStart,
 		players:   NewPlayers(maxPlayers),
 		graveyard: NewGraveyard(),
-		input:     NewKBHandler(),
+		input:     input,
 		handSize:  handSize,
 	}, nil
 }
@@ -101,6 +101,7 @@ func (g *Game) Update() error {
 			if err != nil {
 				// TODO: shouldn't happen? - enable last minute arrival
 				g.state = RoundOver
+				break
 			}
 
 			target := g.players.Current()

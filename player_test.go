@@ -7,6 +7,7 @@ import (
 )
 
 func TestPlay(t *testing.T) {
+	LoadConfig("config.json")
 	LoadCards("cards.json")
 	tbl := []struct {
 		name          string
@@ -258,7 +259,7 @@ func TestPlay(t *testing.T) {
 
 	for _, tc := range tbl {
 		t.Run(fmt.Sprintf(tc.name), func(t *testing.T) {
-			p := Player{Name: "testplayer"}
+			p := NewPlayer(0, "testplayer", 0, 0)
 			for _, c := range tc.beforeCards {
 				card := FindCardByID(c)
 				if card == nil {

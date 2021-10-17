@@ -12,7 +12,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	game, err := NewGame(config.MaxPlayers, config.HandSize)
+	input := NewKBHandler()
+
+	game, err := NewGame(input, config.MaxPlayers, config.HandSize)
 	if err != nil {
 		log.Fatal(err)
 	}
