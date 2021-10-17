@@ -80,7 +80,7 @@ func TestStateInputlessTransitions(t *testing.T) {
 		{
 			0,
 			0,
-			RoundOver,
+			AfterRoundOver,
 			GameOver,
 		},
 	}

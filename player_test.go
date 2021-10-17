@@ -259,7 +259,7 @@ func TestPlay(t *testing.T) {
 
 	for _, tc := range tbl {
 		t.Run(fmt.Sprintf(tc.name), func(t *testing.T) {
-			p := NewPlayer(0, "testplayer", 0, 0)
+			p := NewPlayer(0, "testplayer", nil, 0, 0)
 			for _, c := range tc.beforeCards {
 				card := FindCardByID(c)
 				if card == nil {

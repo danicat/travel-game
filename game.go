@@ -19,6 +19,7 @@ type Game struct {
 	input     InputHandler
 	scene     Scene
 	handSize  int
+	skip      *time.Timer
 }
 
 func NewGame(input InputHandler, maxPlayers, handSize int) (*Game, error) {
@@ -29,7 +30,7 @@ func NewGame(input InputHandler, maxPlayers, handSize int) (*Game, error) {
 
 	return &Game{
 		state:     GameStart,
-		players:   NewPlayers(maxPlayers),
+		players:   NewPlayers(input, maxPlayers),
 		graveyard: NewGraveyard(),
 		input:     input,
 		handSize:  handSize,
@@ -78,7 +79,7 @@ func (g *Game) Update() error {
 
 	case Draw:
 		g.players.Current().hand.selected = -1
-		switch key := g.input.Read(); key {
+		switch key := g.players.Current().Read(); key {
 		case KeyDefaultOrGraveyard:
 			err := g.players.Current().DrawCard(g.deck)
 			if err != nil {
@@ -89,7 +90,7 @@ func (g *Game) Update() error {
 		}
 
 	case Play:
-		switch key := g.input.Read(); key {
+		switch key := g.players.Current().Read(); key {
 		case KeyLeft:
 			g.players.Current().hand.Left()
 
@@ -100,7 +101,7 @@ func (g *Game) Update() error {
 			card, err := g.players.Current().Play()
 			if err != nil {
 				// TODO: shouldn't happen? - enable last minute arrival
-				g.state = RoundOver
+				g.state = BeforeRoundOver
 				break
 			}
 
@@ -140,13 +141,28 @@ func (g *Game) Update() error {
 
 	case TurnOver:
 		if g.players.Current().Distance == config.RoundWin {
-			g.state = RoundOver
+			g.state = BeforeRoundOver
 		} else {
 			g.players.Next()
 			g.state = TurnStart
 		}
 
+	case BeforeRoundOver:
+		g.skip = time.AfterFunc(time.Second*3, func() {
+			log.Println("timer func called")
+			g.state = AfterRoundOver
+		})
+		g.state = RoundOver
+
 	case RoundOver:
+		switch key := g.input.Read(); key {
+		case KeyDefaultOrGraveyard:
+			g.skip.Stop()
+			g.state = AfterRoundOver
+		}
+
+	case AfterRoundOver:
+		log.Println("after round over")
 		g.state = GameOver
 
 	case GameOver:
@@ -184,11 +200,19 @@ func (g *Game) Play(from *Player, to *Player, card Card) error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{R: 00, G: 0x77, B: 0xBE, A: 0xFF})
-	text.Draw(screen, fmt.Sprintf("%s | Distance: %d Phase: %s", g.players.Current().Name, g.players.Current().Distance, g.state), ttfRoboto, 0, config.ScreenHeight-24, color.White)
+	switch g.state {
+	case TurnStart, Draw, Play, TurnOver:
+		screen.Fill(color.RGBA{R: 00, G: 0x77, B: 0xBE, A: 0xFF})
+		text.Draw(screen, fmt.Sprintf("%s | Distance: %d Phase: %s", g.players.Current().Name, g.players.Current().Distance, g.state), ttfRoboto, 0, config.ScreenHeight-24, color.White)
 
-	for _, s := range g.scene.Sprites() {
-		s.Draw(screen)
+		for _, s := range g.scene.Sprites() {
+			s.Draw(screen)
+		}
+	case BeforeRoundOver, RoundOver, AfterRoundOver:
+		screen.Fill(color.RGBA{R: 00, G: 0x77, B: 0xBE, A: 0xFF})
+		msg := fmt.Sprintf("Round Over! Player 1: %d | Player 2: %d", g.players.All()[0].Distance, g.players.All()[1].Distance)
+		bounds := text.BoundString(ttfRoboto, msg)
+		text.Draw(screen, msg, ttfRoboto, config.ScreenWidth/2-bounds.Dx()/2, config.ScreenHeight/2-bounds.Dy()/2, color.White)
 	}
 }
 

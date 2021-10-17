@@ -10,7 +10,7 @@ type Players struct {
 	currentPlayer int
 }
 
-func NewPlayers(numPlayers int) *Players {
+func NewPlayers(input InputHandler, numPlayers int) *Players {
 	if numPlayers == 0 {
 		log.Fatal("cannot start game with zero players")
 	}
@@ -18,7 +18,13 @@ func NewPlayers(numPlayers int) *Players {
 	var players []*Player
 	for i := 0; i < numPlayers; i++ {
 		name := fmt.Sprintf("Player %d", i+1)
-		p := NewPlayer(i, name, config.Layout.Players[i].StartX, config.Layout.Players[i].StartY)
+		var ih InputHandler
+		if i == 0 {
+			ih = input
+		} else {
+			ih = NewAIHandler()
+		}
+		p := NewPlayer(i, name, ih, config.Layout.Players[i].StartX, config.Layout.Players[i].StartY)
 		players = append(players, p)
 	}
 	return &Players{players: players}

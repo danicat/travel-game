@@ -7,7 +7,9 @@ const (
 	GameStart
 	GameOver
 	RoundStart
+	BeforeRoundOver
 	RoundOver
+	AfterRoundOver
 	TurnStart
 	TurnOver
 	Draw

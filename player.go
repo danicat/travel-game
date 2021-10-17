@@ -21,9 +21,11 @@ type Player struct {
 	travel  *TravelStack
 
 	op *ebiten.DrawImageOptions
+
+	input InputHandler
 }
 
-func NewPlayer(id int, name string, startX, startY float64) *Player {
+func NewPlayer(id int, name string, input InputHandler, startX, startY float64) *Player {
 	var op ebiten.DrawImageOptions
 	op.GeoM.Scale(.10, .10)
 	op.GeoM.Translate(startX, startY)
@@ -36,7 +38,12 @@ func NewPlayer(id int, name string, startX, startY float64) *Player {
 		defense: NewDefenseStack(op),
 		travel:  NewTravelStack(op),
 		op:      &op,
+		input:   input,
 	}
+}
+
+func (p *Player) Read() Input {
+	return p.input.Read()
 }
 
 // Play plays the selected card from player hand into field
