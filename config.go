@@ -20,6 +20,8 @@ type Config struct {
 
 	MaxPlayers int `json:"max_players"`
 	HandSize   int `json:"hand_size"`
+	RoundWin   int `json:"round_win"`
+	GameWin    int `json:"game_win"`
 
 	Layout struct {
 		Players   []Rect

@@ -14,7 +14,7 @@ func TestInsert(t *testing.T) {
 	}
 }
 
-func TestDraw(t *testing.T) {
+func TestDrawCard(t *testing.T) {
 	cards := []Card{{ID: "O"}, {ID: "FD"}, {ID: "SR"}, {ID: "E"}}
 	deck := Deck{}
 	for _, c := range cards {
@@ -25,7 +25,7 @@ func TestDraw(t *testing.T) {
 		t.Fatal("expected deck to have the same number of cards")
 	}
 
-	card, err := deck.Draw()
+	card, err := deck.DrawCard()
 	if err != nil {
 		t.Fatal("expected no errors drawing card")
 
@@ -43,7 +43,7 @@ func TestDraw(t *testing.T) {
 func TestDrawNoCards(t *testing.T) {
 	deck := Deck{}
 
-	_, err := deck.Draw()
+	_, err := deck.DrawCard()
 	if err == nil {
 		t.Fatal("expected error drawing from empty deck")
 
@@ -81,7 +81,7 @@ func TestNewDeck(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no errors, got %s", err)
 	}
-	d := NewDeck(Cards)
+	d, _ := NewDeck(Cards)
 	if len(d.cards) != 112 {
 		t.Fatal("expected 112 cards")
 	}

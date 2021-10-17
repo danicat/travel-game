@@ -9,10 +9,8 @@ type Input int
 
 const (
 	KeyNone Input = iota
-	KeySelfOrGraveyard
-	KeySelf
+	KeyDefaultOrGraveyard
 	KeyOpponentOrGraveyard
-	KeyOpponent
 	KeyGraveyard
 	KeyLeft
 	KeyRight
@@ -38,7 +36,7 @@ func NewKBHandler() *KeyboardHandler {
 	go func(i KeyboardHandler) {
 		for ih.Pooling() {
 			if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-				ch <- KeySelfOrGraveyard
+				ch <- KeyDefaultOrGraveyard
 			}
 			if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 				ch <- KeyOpponentOrGraveyard

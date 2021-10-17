@@ -4,6 +4,8 @@
 
     "max_players": 2,
     "hand_size": 6,
+    "round_win": 40000,
+    "game_win": 200000,
 
     "layout": {
         "players": [{
@@ -50,7 +52,7 @@
             "startY": 10
         },
         "card": {
-            "width": 120,
+            "width": 100,
             "height": 160
         },
         "defense": {

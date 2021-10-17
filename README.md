@@ -13,6 +13,9 @@ A remake of an 80's card game classic "Around the World" (pt-br: "Volta ao Mundo
 - Add game end condition
 - AI
 - Hide player 2 hand
+- Add counter mechanics
+- Add card draw after blue is played
+- Add before and after states for timed animation
 
 # Talking points
 

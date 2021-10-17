@@ -1,11 +1,16 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 type Hand struct {
 	cards    []Card
-	op       *ebiten.DrawImageOptions
 	selected int
+}
+
+func NewHand() *Hand {
+	return &Hand{}
 }
 
 func (h *Hand) All() []Card {
@@ -54,7 +59,21 @@ func (h *Hand) Right() {
 	h.selected++
 }
 
-// Sprite returns the next frame in animation
-func (h *Hand) Sprites() ([]*ebiten.Image, []*ebiten.DrawImageOptions) {
-	return nil, nil
+func (h *Hand) Draw(target *ebiten.Image) {
+	// angle := (180 / math.Pi) / float64(len(h.cards))
+	for i, c := range h.cards {
+		var scale float64
+		if h.selected == i {
+			scale = .12
+		} else {
+			scale = .10
+		}
+
+		op := ebiten.DrawImageOptions{}
+		op.GeoM.Scale(scale, scale)
+		// op.GeoM.Rotate(float64(-3*i) * angle)
+		op.GeoM.Translate(config.Layout.Hand.StartX, config.Layout.Hand.StartY)
+		op.GeoM.Translate(float64(i)*config.Layout.Card.Width, 0)
+		target.DrawImage(c.image, &op)
+	}
 }

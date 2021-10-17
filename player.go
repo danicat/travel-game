@@ -3,21 +3,40 @@ package main
 import (
 	"errors"
 	"fmt"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Player struct {
-	Id   int
-	Name string
-
+	ID         int
+	Name       string
 	Distance   int
 	Score      int
 	RoundBonus int
 
-	hand    Hand
-	terrain TerrainStack
-	battle  BattleStack
-	defense DefenseStack
-	travel  Stack
+	hand    *Hand
+	terrain *TerrainStack
+	battle  *BattleStack
+	defense *DefenseStack
+	travel  *TravelStack
+
+	op *ebiten.DrawImageOptions
+}
+
+func NewPlayer(id int, name string, startX, startY float64) *Player {
+	var op ebiten.DrawImageOptions
+	op.GeoM.Scale(.10, .10)
+	op.GeoM.Translate(startX, startY)
+	return &Player{
+		ID:      id,
+		Name:    name,
+		hand:    NewHand(),
+		terrain: NewTerrainStack(op),
+		battle:  NewBattleStack(op),
+		defense: NewDefenseStack(op),
+		travel:  NewTravelStack(op),
+		op:      &op,
+	}
 }
 
 // Play plays the selected card from player hand into field
@@ -74,6 +93,11 @@ func (p *Player) Receive(from *Player, card Card) error {
 		}
 	}
 
+	// validate travel rules
+	if p.Distance+card.Effects.Distance > config.RoundWin {
+		return fmt.Errorf("can't play card because of distance overflow: %d", p.Distance+card.Effects.Distance)
+	}
+
 	// add card to proper stack
 	switch card.Type {
 	case TypeBlue:
@@ -126,19 +150,14 @@ func (p *Player) Status() Status {
 	return status
 }
 
-// Hand returns the cards in the player hand
-func (p *Player) Hand() []Card {
-	return p.hand.All()
-}
-
 // Defense returns the defense cards in the player field
 func (p *Player) Defense() []Card {
 	return p.defense.All()
 }
 
 // Draw draws a card from the deck and add to the players hand
-func (p *Player) Draw(d *Deck) error {
-	card, err := d.Draw()
+func (p *Player) DrawCard(d *Deck) error {
+	card, err := d.DrawCard()
 	if err != nil {
 		return err
 	}
@@ -154,4 +173,11 @@ func (p *Player) Terrain() Card {
 // Battle returns the top card of the battle stack
 func (p *Player) Battle() Card {
 	return p.battle.Top()
+}
+
+func (p *Player) Draw(target *ebiten.Image) {
+	p.terrain.Draw(target)
+	p.battle.Draw(target)
+	p.travel.Draw(target)
+	p.defense.Draw(target)
 }

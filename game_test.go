@@ -75,7 +75,7 @@ func TestStateInputlessTransitions(t *testing.T) {
 
 	for _, testcase := range tbl {
 		t.Run(fmt.Sprintf("transition from %s to %s", testcase.beforeState, testcase.afterState), func(t *testing.T) {
-			game.players.Current().Id = testcase.beforePlayer
+			game.players.Current().ID = testcase.beforePlayer
 			game.state = testcase.beforeState
 			game.Update()
 
@@ -83,8 +83,8 @@ func TestStateInputlessTransitions(t *testing.T) {
 				t.Fatalf("expected state %s, got %s", testcase.afterState, game.state)
 			}
 
-			if game.players.Current().Id != testcase.afterPlayer {
-				t.Fatalf("expected player %d, got %d", testcase.afterPlayer, game.players.Current().Id)
+			if game.players.Current().ID != testcase.afterPlayer {
+				t.Fatalf("expected player %d, got %d", testcase.afterPlayer, game.players.Current().ID)
 			}
 		})
 	}
