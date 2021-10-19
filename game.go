@@ -7,19 +7,24 @@ import (
 	"os"
 	"time"
 
+	_ "image/jpeg"
+
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
 type Game struct {
-	state     State
-	deck      *Deck
-	players   *Players
-	graveyard *Graveyard
-	input     InputHandler
-	scene     Scene
-	handSize  int
-	skip      *time.Timer
+	state      State
+	deck       *Deck
+	players    *Players
+	graveyard  *Graveyard
+	input      InputHandler
+	scene      Scene
+	handSize   int
+	skip       *time.Timer
+	background *ebiten.Image
+	op         *ebiten.DrawImageOptions
 }
 
 func NewGame(input InputHandler, maxPlayers, handSize int) (*Game, error) {
@@ -28,12 +33,23 @@ func NewGame(input InputHandler, maxPlayers, handSize int) (*Game, error) {
 		return nil, err
 	}
 
+	img, _, err := ebitenutil.NewImageFromFile("assets/vecteezy_wood-table-texture_1227153.jpg")
+	if err != nil {
+		return nil, err
+	}
+
+	op := ebiten.DrawImageOptions{}
+	op.ColorM.ChangeHSV(0, 1, .8)
+	op.GeoM.Scale(.25, .25)
+
 	return &Game{
-		state:     GameStart,
-		players:   NewPlayers(input, maxPlayers),
-		graveyard: NewGraveyard(),
-		input:     input,
-		handSize:  handSize,
+		state:      GameStart,
+		players:    NewPlayers(input, maxPlayers),
+		graveyard:  NewGraveyard(),
+		input:      input,
+		handSize:   handSize,
+		background: img,
+		op:         &op,
 	}, nil
 }
 
@@ -202,7 +218,8 @@ func (g *Game) Play(from *Player, to *Player, card Card) error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.state {
 	case TurnStart, Draw, Play, TurnOver:
-		screen.Fill(color.RGBA{R: 00, G: 0x77, B: 0xBE, A: 0xFF})
+		// screen.Fill(color.RGBA{R: 0xf3, G: 0xff, B: 0xe3, A: 0xFF})
+		screen.DrawImage(g.background, g.op)
 		text.Draw(screen, fmt.Sprintf("%s | Distance: %d Phase: %s", g.players.Current().Name, g.players.Current().Distance, g.state), ttfRoboto, 0, config.ScreenHeight-24, color.White)
 
 		for _, s := range g.scene.Sprites() {

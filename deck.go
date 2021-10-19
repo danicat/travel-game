@@ -55,6 +55,7 @@ func (d *Deck) DrawCard() (Card, error) {
 func (d *Deck) Reset() {
 	d.op.GeoM.Reset()
 	d.op.GeoM.Scale(.125, .15)
+	d.op.ColorM.ChangeHSV(0, 1, .8)
 	d.op.GeoM.Translate(config.Layout.System.StartX+config.Layout.Deck.StartX, config.Layout.System.StartY+config.Layout.Deck.StartY)
 }
 

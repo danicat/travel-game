@@ -4,7 +4,6 @@ import "github.com/hajimehoshi/ebiten/v2"
 
 type Stack struct {
 	cards []Card
-	op    *ebiten.DrawImageOptions
 }
 
 func (s *Stack) Put(c Card) {
